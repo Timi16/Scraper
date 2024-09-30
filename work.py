@@ -1,13 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 
-def scrape_warning_notice():
-    url = "https://www.belizefsc.org.bz/warning-notice/"
+def scrape_warning_notice(url):
     response = requests.get(url)
     
     if response.status_code != 200:
         print(f"Failed to retrieve the page. Status code: {response.status_code}")
-        return
+        return []
     
     soup = BeautifulSoup(response.content, 'html.parser')
     warning_sections = soup.find_all('article')
@@ -19,13 +18,13 @@ def scrape_warning_notice():
             company = heading.get_text(strip=True)
             companies.append(company)
     
-    if companies:
-        with open("warning_notices.txt", "w", encoding="utf-8") as file:
-            file.write("Companies with warning notices:\n\n")
-            for idx, company in enumerate(companies, 1):
-                file.write(f"{idx}. {company}\n")
-        print("Scraped data has been successfully written to warning_notices.txt'")
-    else:
-        print("No companies found under warning notices.")
+    return companies
 
-scrape_warning_notice()
+# Example usage
+url = "https://www.belizefsc.org.bz/warning-notice/"
+company_list = scrape_warning_notice(url)
+
+if company_list:
+    print("Companies with warning notices:", company_list)
+else:
+    print("No companies found.")

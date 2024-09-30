@@ -1,13 +1,13 @@
+
 import requests
 from bs4 import BeautifulSoup
 
-def scrape_names():
-    url = "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2001-360/FullText.html"
+def scrape_names(url):
     response = requests.get(url)
 
     if response.status_code != 200:
         print(f"Failed to retrieve the page. Status code: {response.status_code}")
-        return
+        return []
 
     soup = BeautifulSoup(response.content, 'html.parser')
     
@@ -22,13 +22,16 @@ def scrape_names():
                 name = li.get_text(strip=True)
                 if name:
                     names.append(name)
-    
-    if names:
-        with open("names.txt", "w", encoding="utf-8") as file:
-            for name in names:
-                file.write(name + "\n")
-        print("Names have been successfully written into names.txt'.")
     else:
-        print("No names found .")
+        print("No 'Coming into Force' section found.")
+    
+    return names
 
-scrape_names()
+# Example usage
+url = "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2001-360/FullText.html"
+names_list = scrape_names(url)
+
+if names_list:
+    print("Names found:", names_list)
+else:
+    print("No names found.")
